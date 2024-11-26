@@ -7,9 +7,9 @@ ArrayList<Alert> alerts = new ArrayList<Alert>();
   
 // displays the alerts in a list view
 void displayAlertsScreen() {
+  background(236);
   
   if(alerts.size() == 0){
-    fill(50);
     textAlign(CENTER, CENTER);
     textSize(24);
     text("No alerts to display", width / 2, height / 2);
@@ -41,7 +41,7 @@ class Alert {
   
   // displays an alert styled as a panel
   void display(float x, float y, float w, float h) {
-    fill(100, 150, 200);
+    fill(133, 173, 166);
     rect(x, y, w, h, 10);
     fill(255);
     textAlign(LEFT, CENTER);

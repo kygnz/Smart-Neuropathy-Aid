@@ -9,7 +9,7 @@ int calendarWidth = 300;    // Width of the calendar
 int calendarHeight = 350;   // Height of the calendar
 int circleSize = 30;        // Diameter of day circles
 int spacing = 10;           // Spacing between circles
-color bgColor = color(255); // Background color for the calendar
+color bgColor = color(250); // Background color for the calendar
 
 // Sample data for alerts
 HashMap<String, Boolean> alertsCalendar = new HashMap<String, Boolean>();
@@ -23,6 +23,7 @@ int todayDate = 23;
 
 
 void drawHistoryScreen() {
+  background(236);
   // Header
   fill(50);
   textAlign(CENTER, CENTER);

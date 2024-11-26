@@ -10,6 +10,7 @@ MainButton historyButton;
 
 void setup() {
   size(430, 770);
+  frontendSetup();
   // Initialize Navigation buttons
   summaryButton = new MainButton(0, height - 50, width / 3, 50, "Summary", true);
   alertsButton = new MainButton(width / 3, height - 50, width / 3, 50, "Alerts", false);
@@ -54,8 +55,6 @@ void draw() {
   }
   else if (appState == 2) {
     drawHistoryScreen();
-    //drawCalendar();
-    //drawMonthNavigation();
     // toggle navigation buttons
     summaryButton.isPressed = false;
     alertsButton.isPressed = false;
@@ -85,7 +84,7 @@ void serialEvent(Serial myPort) {
 }
 
 
-
+// helper function to recieve an alert
 void receiveAlert(String rawData) {
   String[] parts = split(rawData, "|");
   if (parts.length == 4 && parts[0].equals("ALERT")) {

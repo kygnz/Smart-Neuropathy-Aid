@@ -1,3 +1,9 @@
+// COLORS:
+// color(133, 173, 166) - light green
+// color(215, 223, 241) - light blue
+// fill(0, 48, 73); - navy blue (for text)
+
+
 // Navigation Button Class
 class MainButton {
   float x, y, w, h;
@@ -18,16 +24,25 @@ class MainButton {
 
   color getColor(){
     if(isPressed){
-      return color(240);
+      return color(250);
+      //return color(69, 70, 69);
     }
-    return color(200);
+    return color(107, 144, 128);
+  }
+  
+  color getTextFill(){
+    if(isPressed){
+      return color(0, 48, 73);
+      //return color(69, 70, 69);
+    }
+    return color(250);
   }
   
   void display() {
     fill(getColor());
     noStroke();
     rect(x, y, w, h);
-    fill(textColor);
+    fill(getTextFill());
     textAlign(CENTER, CENTER);
     textSize(16);
     text(label, x + w / 2, y + h / 2);
@@ -41,7 +56,7 @@ class MainButton {
 
 
 
-// Summary Window Buttons
+// Summary Window Button Class
 class MoreInfoButton {
   float x, y, w, h;
   String label;
@@ -53,13 +68,13 @@ class MoreInfoButton {
     this.w = w;
     this.h = h;
     this.label = label;
-    this.bgColor = color(200);  // Default background color
+    this.bgColor = color(133, 173, 166);  // Default background color
     this.textColor = color(255);// Default text color
   }
 
   
   void display() {
-    fill(100, 150, 200);
+    fill(bgColor);
     noStroke();
     rect(x, y, w, h, 10);
     fill(textColor);

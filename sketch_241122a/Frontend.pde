@@ -1,4 +1,11 @@
+PFont font;
 
+
+void frontendSetup(){
+  font = createFont("Trebuchet MS", 32);
+  textFont(font);
+  //background(239, 235, 239);
+}
 
 
 void mousePressed() {

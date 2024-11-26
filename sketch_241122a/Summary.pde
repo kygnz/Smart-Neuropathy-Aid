@@ -36,8 +36,10 @@ void summarySetup(){
 }
 
 void drawSummaryScreen() {
+  //background(239, 235, 239);
+  background(236);
   // Summary screen content
-  fill(50);
+  fill(0, 48, 73);
   textAlign(CENTER, CENTER);
   textSize(34);
   text("Welcome, Ky", width / 2, height / 10);
@@ -48,20 +50,20 @@ void drawSummaryScreen() {
   
   
   // Display temperature summary
-  fill(100, 150, 200);              // Rectangle fill color
+  fill(250);              // Rectangle fill color
   noStroke();                       
   rect(tRectX, tRectY, tRectWidth, tRectHeight, tRectCornerRadius);
-  fill(255);                        // Text fill color
+  fill(0, 48, 73);                        // Text fill color
   textSize(tTextSize);
   text(tLabel, tTextX, tTextY);
   tempButton.display();
   
   
   // Display humidity summary
-  fill(100, 150, 200);              // Rectangle fill color
+  fill(250);              // Rectangle fill color
   noStroke();                       
   rect(hRectX, hRectY, hRectWidth, hRectHeight, hRectCornerRadius);
-  fill(255);                        // Text fill color
+  fill(0, 48, 73);                       // Text fill color
   textSize(hTextSize);
   text(hLabel, hTextX, hTextY);
   humidityButton.display();

@@ -2,12 +2,12 @@ int windowWidth = 440;
 int windowHeight = 770;
 int margin = 60;         // Space around the graph
 int graphHeight = (windowHeight - (margin * 5)) / 4; // Same style as first graph
-color graphColor = color(200, 50, 50);
+color graphColor = color(250);
 
 void drawTempScreen(){
-  
+  background(236);
   // Current Temperature Section
-  fill(50); 
+  fill(0, 48, 73); 
   textAlign(CENTER, CENTER);
   textSize(14);
   text("Current Temperature:", width / 2, height / 10);
@@ -33,7 +33,7 @@ void drawTempGraph(){
   rect(margin - 10, yBase - 10, windowWidth - margin * 2 + 40, graphHeight + 40, 20);
 
   // Draw title
-  fill(0);
+  fill(0, 48, 73);
   textAlign(CENTER, CENTER);
   textSize(18);
   text("Temperature Data", windowWidth / 2, yBase - 40);
@@ -45,7 +45,7 @@ void drawTempGraph(){
   line(margin, yBase + graphHeight, windowWidth - margin, yBase + graphHeight);  // X-axis
 
   // Draw axis labels
-  fill(0);
+  fill(0, 48, 73);
   textSize(14);
 
   // Y-axis label
