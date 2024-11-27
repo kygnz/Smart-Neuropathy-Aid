@@ -6,7 +6,7 @@ ArrayList<Alert> alerts = new ArrayList<Alert>();
 
   
 // displays the alerts in a list view
-void displayAlertsScreen() {
+void displayAlertsScreen(ArrayList<Alert> alerts) {
   background(236);
   
   if(alerts.size() == 0){
@@ -29,13 +29,13 @@ void displayAlertsScreen() {
 // Class to manage layout and information of an alert
 class Alert {
   String type;
-  String message;
+  String value;
   String time;
   
   // constructor
-  Alert(String type, String message, String time) {
+  Alert(String type, String value, String time) {
     this.type = type;
-    this.message = message;
+    this.value = value;
     this.time = time;
   }
   
@@ -46,6 +46,6 @@ class Alert {
     fill(255);
     textAlign(LEFT, CENTER);
     textSize(14);
-    text(type + ": " + message + "\n" + "Time: " + time, x + 10, y + h / 2);
+    text(type + ": " + value + "\n" + "Time: " + time, x + 10, y + h / 2);
   }
 }

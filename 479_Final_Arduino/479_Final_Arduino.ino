@@ -69,22 +69,24 @@ void loop()
   Serial.println(rightFSRValue);
 
   // Check for alerts and handle LEDs/Buzzer
-  handleAlert(humidity > 65, "Humidity", humidity, blueLEDPin, currentMillis);
-  handleAlert(tempF > 100, "Temp", tempF, redLEDPin, currentMillis);
-  handleAlert(leftFSRValue > threshold || rightFSRValue > threshold, "FSR", max(leftFSRValue, rightFSRValue), yellowLEDPin, currentMillis);
+  handleAlert(humidity > 65, "Humidity", "High humidity levels detected! "+String(humidity)+" %", blueLEDPin, currentMillis);
+  handleAlert(tempF > 80, "Temperature", "High temperature detected! "+String(tempF)+ " °F", redLEDPin, currentMillis);
+  handleAlert(leftFSRValue > threshold || rightFSRValue > threshold, "Pressure", "Excess pressure on foot detected! "+String(max(leftFSRValue, rightFSRValue)) +" FSR", yellowLEDPin, currentMillis);
 
   // Manage buzzer timeout
   manageBuzzer(currentMillis);
+  delay(200);
 
 }
 
-void handleAlert(bool condition, String type, float value, int ledPin, unsigned long currentMillis) {
+void handleAlert(bool condition, String type, String value, int ledPin, unsigned long currentMillis) {
   if (condition) {
     Serial.print("Alert: ");
     Serial.print(type);
     Serial.print(": ");
     Serial.print(value);
-    Serial.print(" at ");
+    Serial.print(": ");
+    Serial.print("at ");
     Serial.println(getFormattedTime(currentMillis));
 
     digitalWrite(ledPin, HIGH); // Keep LED on
