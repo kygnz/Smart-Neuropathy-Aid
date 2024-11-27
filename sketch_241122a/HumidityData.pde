@@ -26,7 +26,7 @@ void drawHumidityScreen(){
         }
 
         int average = int(sum / humidityData.size());
-  text("Average: " + average+" %", width / 2, height / 10 + 95); // replace with variable for actual data
+  text("Average: " + int( average)+" %", width / 2, height / 10 + 95); // replace with variable for actual data
   }
   
   // display temeprature graph
