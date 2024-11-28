@@ -19,7 +19,7 @@ int startTime;
 
 void setup() {
   size(430, 770);
-  myPort = new Serial(this, Serial.list()[9], 115200); // Connect to Arduino
+  myPort = new Serial(this, Serial.list()[0], 115200); // Connect to Arduino
   myPort.bufferUntil('\n');  
   frontendSetup();
   // Initialize Navigation buttons
@@ -27,10 +27,11 @@ void setup() {
   alertsButton = new MainButton(width / 3, height - 50, width / 3, 50, "Alerts", false);
   historyButton = new MainButton(width / 3 * 2, height - 50, width / 3, 50, "History", false);
   startTime = millis();
+  
   // Example alerts - HARDCODED FOR NOW
-  alerts.add(new Alert("Temperature:"," High temperature detected! 90 F" ,"11:30 AM"));
-  alerts.add(new Alert("Pressure:"," Excess pressure on foot detected! 300 FSR", " 11:45 AM"));
-  alerts.add(new Alert("Humidity: "," High humidity levels detected! 35 %" ,"12:00 PM"));
+  //alerts.add(new Alert("Temperature:"," High temperature detected! 90 F" ,"11:30 AM"));
+  //alerts.add(new Alert("Pressure:"," Excess pressure on foot detected! 300 FSR", " 11:45 AM"));
+  //alerts.add(new Alert("Humidity: "," High humidity levels detected! 35 %" ,"12:00 PM"));
   
   
   // Populate alerts (true = alert, false = no alert) HARDCODED FOR NOW
@@ -110,18 +111,26 @@ void serialEvent(Serial myPort) {
         println(inputString);
         // Example: "Alert: Temp: 75.78 at 10:39:10"
         String[] parts = split(inputString, ": ");
-        println(parts[2]);
-        String type = parts[1];     // "Temp", "Fsr", or "Humidity"
-        String value = parts[2]; // Extract the value
-        String time = parts[3].split(" at ")[1]; // Extract the timestamp
+        String type = parts[1].trim(); // e.g., "Temperature"
+        String remaining = parts[2].trim(); // e.g., "High temperature detected! 95 °F at 10:39:10"
+        
+        // Split remaining into value and time
+        int atIndex = remaining.lastIndexOf(" at ");
+        if (atIndex == -1) {
+          println("Error: Missing 'at' in alert string.");
+          return;
+        }
+        
+        String value = remaining.substring(0, atIndex).trim(); // e.g., "High temperature detected! 95 °F"
+        String time = remaining.substring(atIndex + 4).trim(); // e.g., "10:39:10"
         
         // Create a new Alert object and add it to the list
         alerts.add(new Alert(type, value, time));
         
-        // Limit the number of stored alerts
-        if (alerts.size() > 50) { 
-          alerts.remove(0); // Remove the oldest alert to maintain size
+        while (alerts.size() > 100) {
+          alerts.remove(0); // Remove the oldest alert
         }
+        //alerts.removeAll(toRemove);
       } catch (Exception e) {
         println("Error parsing alert: " + e.getMessage());
       }

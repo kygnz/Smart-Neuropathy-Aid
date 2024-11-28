@@ -4,17 +4,34 @@
 SI7021 myHumidity;
 
 // Pin Definitions
-const int leftFSR = A1;    // Left FSR
-const int rightFSR = A0;   // Right FSR
+const int leftFSR = A0;    // Left FSR
+const int rightFSR = A1;   // Right FSR
 const int buzzerPin = 3;   // Buzzer
 const int redLEDPin = 5;   // Red LED
 const int blueLEDPin = 9;  // Blue LED
 const int yellowLEDPin = 6; // Yellow LED
 // int melody[] = []; // C4 to C5
 
-
+// bool alarmActive = false;
 // Threshold for detecting a press
+// float temperatureThreshold = 95.0;
 const int threshold = 800; // Adjust this value based on your FSR sensitivity
+// float temperatureThresholdLow = 90.0; // Low-temperature threshold to stop alarm
+const float humidityThreshold = 65.0;
+const float temperatureThresholdHigh = 95.0;
+const float temperatureThresholdLow = 90.0;
+unsigned long previousMillis = 0; // Timer
+unsigned long alertCooldown = 5000;
+const unsigned long interval = 1000;
+
+// Previous sensor readings
+float previousHumidity = 0.0;
+float previousTemperature = 0.0;
+unsigned long lastAlertTime = 0;
+
+// States for tracking alerts
+bool humidityAlertActive = false;
+bool temperatureAlertActive = false;
 
 // Variables for buzzer timing
 unsigned long buzzerStartTime = 0;
@@ -45,6 +62,7 @@ void setup()
 
 void loop()
 {
+
   // Measure Relative Humidity
   float humidity = myHumidity.getRH();
 
@@ -68,10 +86,58 @@ void loop()
   Serial.print(" | Right FSR:");
   Serial.println(rightFSRValue);
 
+
+/*ORIGINAL VALUESSSSSSS*/
   // Check for alerts and handle LEDs/Buzzer
-  handleAlert(humidity > 65, "Humidity", "High humidity levels detected! "+String(humidity)+" %", blueLEDPin, currentMillis);
-  handleAlert(tempF > 80, "Temperature", "High temperature detected! "+String(tempF)+ " °F", redLEDPin, currentMillis);
-  handleAlert(leftFSRValue > threshold || rightFSRValue > threshold, "Pressure", "Excess pressure on foot detected! "+String(max(leftFSRValue, rightFSRValue)) +" FSR", yellowLEDPin, currentMillis);
+  // handleAlert(humidity > 65, "Humidity", "High humidity levels detected! "+String(humidity)+" %", blueLEDPin, currentMillis);
+  // handleAlert(tempF > 80, "Temperature", "High temperature detected! "+String(tempF)+ " °F", redLEDPin, currentMillis);
+  // handleAlert(leftFSRValue > threshold || rightFSRValue > threshold, "Pressure", "Excess pressure on foot detected! "+String(max(leftFSRValue, rightFSRValue)) +" FSR", yellowLEDPin, currentMillis);
+
+// handleAlert(humidity > 65, "Humidity", "High humidity levels detected! "+String(humidity)+" %", blueLEDPin, currentMillis);
+//   handleAlert(tempF > 95, "Temperature", "High temperature detected! "+String(tempF)+ " °F", redLEDPin, currentMillis);
+//   handleAlert(leftFSRValue > threshold || rightFSRValue > threshold-250, "Pressure", "Excess pressure on foot detected! "+String(max(leftFSRValue, rightFSRValue)) +" FSR", yellowLEDPin, currentMillis);
+
+
+    // Handle Humidity Alert
+    if (humidity > humidityThreshold) {
+      if (!humidityAlertActive || humidity > previousHumidity) {
+        humidityAlertActive = true;
+        handleAlert(true, "Humidity", "High humidity levels detected! " + String(humidity) + " %", blueLEDPin, currentMillis);
+      }
+    } else if (humidityAlertActive && humidity < previousHumidity) {
+      humidityAlertActive = false;
+      handleAlert(false, "Humidity", "Humidity back to safe levels: " + String(humidity) + " %", blueLEDPin, currentMillis);
+    }
+
+    // Handle Temperature Alert
+    if (tempF > temperatureThresholdHigh) {
+      if (!temperatureAlertActive || tempF > previousTemperature) {
+        temperatureAlertActive = true;
+        handleAlert(true, "Temperature", "High temperature detected! " + String(tempF) + " °F", redLEDPin, currentMillis);
+      }
+    } else if (temperatureAlertActive && tempF < temperatureThresholdLow) {
+      temperatureAlertActive = false;
+      handleAlert(false, "Temperature", "Temperature back to safe levels: " + String(tempF) + " °F", redLEDPin, currentMillis);
+    }
+
+    // handleAlert(humidity > 65, "Humidity", "High humidity levels detected! " + String(humidity) + " %", blueLEDPin, currentMillis);
+    // handleAlert(tempF > 95, "Temperature", "High temperature detected! " + String(tempF) + " \u00B0F", redLEDPin, currentMillis);
+    handleAlert(leftFSRValue > threshold || rightFSRValue > threshold - 250, "Pressure", "Excess pressure on foot detected! " + String(max(leftFSRValue, rightFSRValue)) + " FSR", yellowLEDPin, currentMillis);
+  // if (tempF > temperatureThreshold && !alarmActive) {
+  //       alarmActive = true;
+  //       handleAlert(true, "Temperature", "High temperature detected! " + String(tempF) + " °F", redLEDPin, currentMillis);
+  //   }
+
+  //   // Handle cooling down (below low threshold)
+  //   if (tempF < temperatureThresholdLow && alarmActive) {
+  //       alarmActive = false;
+  //       handleAlert(false, "Temperature", "Temperature back to safe levels: " + String(tempF) + " °F", redLEDPin, currentMillis);
+  //       stopAlarm(); // Function to stop the alarm
+  //   }
+
+  // Update previous readings for comparison
+  previousHumidity = humidity;
+  previousTemperature = tempF;
 
   // Manage buzzer timeout
   manageBuzzer(currentMillis);
@@ -81,16 +147,18 @@ void loop()
 
 void handleAlert(bool condition, String type, String value, int ledPin, unsigned long currentMillis) {
   if (condition) {
-    Serial.print("Alert: ");
-    Serial.print(type);
-    Serial.print(": ");
-    Serial.print(value);
-    Serial.print(": ");
-    Serial.print("at ");
-    Serial.println(getFormattedTime(currentMillis));
+    if (currentMillis - lastAlertTime > alertCooldown) {
+        Serial.print("Alert: ");
+        Serial.print(type);
+        Serial.print(": ");
+        Serial.print(value);
+        Serial.print(" at ");
+        Serial.println(getFormattedTime(currentMillis));
 
-    digitalWrite(ledPin, HIGH); // Keep LED on
-    triggerBuzzer(currentMillis,type); // Turn on the buzzer for 3 seconds
+        digitalWrite(ledPin, HIGH); // Keep LED on
+        triggerBuzzer(currentMillis,type); // Turn on the buzzer for 3 seconds
+        lastAlertTime = currentMillis;
+    }
   } else {
     digitalWrite(ledPin, LOW); // Turn off LED
   }
