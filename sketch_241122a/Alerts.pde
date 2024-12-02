@@ -33,10 +33,16 @@ void mouseWheel(MouseEvent event) {
 // Displays the alerts in a scrollable list view
 void displayAlertsScreen(ArrayList<Alert> alerts) {
   background(236);
+  fill(0, 48, 73);
+  textAlign(CENTER, CENTER);
+  textSize(34);
+  text("Alerts", width / 2, height / 10);
+  
   totalHeight = alerts.size() * itemHeight; // Calculate total height
 
   if (alerts.size() == 0) {
     textAlign(CENTER, CENTER);
+    fill(0, 48, 73);
     textSize(24);
     text("No alerts to display", width / 2, height / 2);
   } else {
@@ -48,7 +54,7 @@ void displayAlertsScreen(ArrayList<Alert> alerts) {
     //  alert.display(30, y, 375, 80);
     //  y += itemHeight; // Spacing between alerts
     //}
-    float y = 50; // Starting y position
+    float y = 130; // Starting y position
     Iterator<Alert> iterator = alerts.iterator();
     while (iterator.hasNext()) {
       Alert alert = iterator.next();
@@ -124,11 +130,11 @@ class Alert {
   
   color getColor() {
   if (this.type.equals("Temperature")) {
-    return color(255, 172, 129); // Orange
+    return color(216, 87, 42); // Orange
   } else if (this.type.equals("Humidity")) {
-    return color(171, 215, 237); // Light blue
+    return color(33, 158, 188); // Light blue
   } else if (this.type.equals("Pressure")) {
-    return color(235, 227, 153); // Yellow
+    return color(233, 196, 106); // Yellow
   } else {
     return color(250); // Default grayish white
   }

@@ -1,6 +1,8 @@
 import processing.serial.*;
-Serial myPort;
+import java.util.HashMap;
 
+
+Serial myPort;
 
 int appState = 0;  // 0 = Summary, 1 = Browse
 MainButton summaryButton;
@@ -12,8 +14,6 @@ String inputString = ""; // Variable to store incoming data
 ArrayList<Float> temperatureData = new ArrayList<>();
 ArrayList<Float> humidityData = new ArrayList<>();
 int startTime;
-//float[] temperatureData; // Array to hold temperature data
-//float[] humidityData ;    // Array to hold humidity data
 
 
 
@@ -34,14 +34,17 @@ void setup() {
   //alerts.add(new Alert("Humidity: "," High humidity levels detected! 35 %" ,"12:00 PM"));
   
   
-  // Populate alerts (true = alert, false = no alert) HARDCODED FOR NOW
-  // maybe add some hardcoded alerts to demonstrate functionality
+  // Populate alerts (true = alert, false = no alert) 
+  // added hardcoded alerts to demonstrate functionality
   // along with our real data
-  alertsCalendar.put("September-10", true);
-  alertsCalendar.put("September-15", false);
-  alertsCalendar.put("October-5", true);
-  alertsCalendar.put("November-20", true);
-  alertsCalendar.put("November-23", false); // Today, no alert
+  // Populate alert history dynamically
+  addAlert("September-10", "Temperature Alert: High temperature detected!");
+  addAlert("September-10", "Temperature Alert: High temperature detected!");
+  addAlert("September-10", "Pressure Alert: Excess pressure detected on foot!");
+  addAlert("September-10", "Pressure Alert: Excess pressure detected on foot!");
+  addAlert("October-5", "Pressure Alert: Excess pressure detected on foot!");
+  addAlert("November-20", "Humidity Alert: High humidity detected!");
+  addAlert("November-20", "Temperature Alert: High temperature detected!");
   
   summarySetup();
   
@@ -66,7 +69,12 @@ void draw() {
     historyButton.isPressed = false;
   }
   else if (appState == 2) {
-    drawHistoryScreen();
+    //drawHistoryScreen();
+    if (showAlertDetails) {
+      drawAlertDetails();
+    } else {
+      drawHistoryScreen();
+    }
     // toggle navigation buttons
     summaryButton.isPressed = false;
     alertsButton.isPressed = false;
@@ -92,64 +100,52 @@ void serialEvent(Serial myPort) {
   if (inputString != null) {
     inputString = trim(inputString);          // Remove extra spaces
     if (inputString.startsWith("Humidity:")) {
-      // Parse the data
-      try {
-        String[] parts = split(inputString, ", ");
-        float humidity = float(split(parts[0], ":")[1].replace('%', ' '));
-        float temperature = float(split(parts[1], ":")[1].replace('F', ' '));
-        //println(humidity);
-        //println(temperature);
-        temperatureData.add( temperature);
-        humidityData.add(humidity);
-     
-       
-      } catch (Exception e) {
-        println("Error parsing data: " + e.getMessage());
+      synchronized (humidityData) {
+        try {
+          String[] parts = split(inputString, ", ");
+          float humidity = float(split(parts[0], ":")[1].replace('%', ' '));
+          float temperature = float(split(parts[1], ":")[1].replace('F', ' '));
+          temperatureData.add(temperature);
+          humidityData.add(humidity);
+        } catch (Exception e) {
+          println("Error parsing data: " + e.getMessage());
+        }
       }
+      
     } else  if (inputString.startsWith("Alert:")) {
-      try {
-        println(inputString);
-        // Example: "Alert: Temp: 75.78 at 10:39:10"
-        String[] parts = split(inputString, ": ");
-        String type = parts[1].trim(); // e.g., "Temperature"
-        String remaining = parts[2].trim(); // e.g., "High temperature detected! 95 °F at 10:39:10"
-        
-        // Split remaining into value and time
-        int atIndex = remaining.lastIndexOf(" at ");
-        if (atIndex == -1) {
-          println("Error: Missing 'at' in alert string.");
-          return;
+      synchronized (alerts) {
+        try {
+          println(inputString);
+          String[] parts = split(inputString, ": ");
+          String type = parts[1].trim();
+          String remaining = parts[2].trim();
+          int atIndex = remaining.lastIndexOf(" at ");
+          if (atIndex == -1) {
+            println("Error: Missing 'at' in alert string.");
+            return;
+          }
+
+          String value = remaining.substring(0, atIndex).trim();
+          String time = remaining.substring(atIndex + 4).trim();
+
+          alerts.add(new Alert(type, value, time));
+
+          // Add alert to the calendar
+          addAlert("December-3", type + ": " + value);
+
+          showAlert = true;
+          lastAlertTime = millis();
+
+          // Limit alerts to 100
+          while (alerts.size() > 100) {
+            alerts.remove(0);
+          }
+        } catch (Exception e) {
+          println("Error parsing alert: " + e.getMessage());
         }
-        
-        String value = remaining.substring(0, atIndex).trim(); // e.g., "High temperature detected! 95 °F"
-        String time = remaining.substring(atIndex + 4).trim(); // e.g., "10:39:10"
-        
-        // Create a new Alert object and add it to the list
-        alerts.add(new Alert(type, value, time));
-        
-        while (alerts.size() > 100) {
-          alerts.remove(0); // Remove the oldest alert
-        }
-        //alerts.removeAll(toRemove);
-      } catch (Exception e) {
-        println("Error parsing alert: " + e.getMessage());
       }
+      
     }
   }
   
-  
-  //String input = myPort.readStringUntil('\n');
-  //if (input != null) {
-  //  input = trim(input);
-  //  receiveAlert(input);
-  //}
 }
-
-
-// helper function to recieve an alert
-//void receiveAlert(String rawData) {
-//  String[] parts = split(rawData, "|");
-//  if (parts.length == 4 && parts[0].equals("ALERT")) {
-//    alerts.add(new Alert(parts[1], parts[2], parts[3]));
-//  }
-//}
