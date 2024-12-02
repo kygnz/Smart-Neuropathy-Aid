@@ -38,14 +38,36 @@ void setup() {
   // added hardcoded alerts to demonstrate functionality
   // along with our real data
   // Populate alert history dynamically
-  addAlert("September-10", "Temperature Alert: High temperature detected!");
-  addAlert("September-10", "Temperature Alert: High temperature detected!");
-  addAlert("September-10", "Pressure Alert: Excess pressure detected on foot!");
-  addAlert("September-10", "Pressure Alert: Excess pressure detected on foot!");
-  addAlert("October-5", "Pressure Alert: Excess pressure detected on foot!");
-  addAlert("November-20", "Humidity Alert: High humidity detected!");
-  addAlert("November-20", "Temperature Alert: High temperature detected!");
+  //addAlert("September-10", "Temperature Alert: High temperature detected!");
+  //addAlert("September-10", "Temperature Alert: High temperature detected!");
+  //addAlert("September-10", "Pressure Alert: Excess pressure detected on foot!");
+  //addAlert("September-10", "Pressure Alert: Excess pressure detected on foot!");
+  //addAlert("October-5", "Pressure Alert: Excess pressure detected on foot!");
+  //addAlert("November-20", "Humidity Alert: High humidity detected!");
+  //addAlert("November-20", "Temperature Alert: High temperature detected!");
+  // Add alerts to the alerts list and associate their indices with dates
+  alerts.add(new Alert("Temperature", "High temperature detected!", "10:39 AM"));
+  addAlert("September-10", alerts.size() - 1); // Associate with "September-10"
   
+  alerts.add(new Alert("Temperature", "High temperature detected!", "10:40 AM"));
+  addAlert("September-10", alerts.size() - 1); // Associate with "September-10"
+  
+  alerts.add(new Alert("Pressure", "Excess pressure detected on foot!", "10:45 AM"));
+  addAlert("September-10", alerts.size() - 1); // Associate with "September-10"
+  
+  alerts.add(new Alert("Pressure", "Excess pressure detected on foot!", "10:50 AM"));
+  addAlert("September-10", alerts.size() - 1); // Associate with "September-10"
+  
+  alerts.add(new Alert("Pressure", "Excess pressure detected on foot!", "11:00 AM"));
+  addAlert("October-5", alerts.size() - 1); // Associate with "October-5"
+  
+  alerts.add(new Alert("Humidity", "High humidity detected!", "11:30 AM"));
+  addAlert("November-20", alerts.size() - 1); // Associate with "November-20"
+  
+  alerts.add(new Alert("Temperature", "High temperature detected!", "11:45 AM"));
+  addAlert("November-20", alerts.size() - 1); 
+    
+    
   summarySetup();
   
 }
@@ -131,7 +153,7 @@ void serialEvent(Serial myPort) {
           alerts.add(new Alert(type, value, time));
 
           // Add alert to the calendar
-          addAlert("December-3", type + ": " + value);
+          addAlert("December-3", alerts.size() - 1);
 
           showAlert = true;
           lastAlertTime = millis();

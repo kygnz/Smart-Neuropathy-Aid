@@ -10,16 +10,6 @@ float itemHeight = 90;  // Height of each alert (including spacing)
 //int windowHeight = 400; // Visible height of the window
 float totalHeight;        // Total height of the alerts list
 
-//void alertSetup() {
-//  //size(400, windowHeight);
-
-//  //// Add test alerts
-//  //for (int i = 0; i < 20; i++) {
-//  //  alerts.add(new Alert("Type " + i, "Message " + i, "Time " + i));
-//  //}
-
-  
-//}
 
 
 void mouseWheel(MouseEvent event) {
@@ -80,6 +70,8 @@ void drawScrollbar() {
   fill(240);
   rect(width - 10, scrollbarY, 10, scrollbarHeight); // Scrolling thumb
 }
+
+
 
 
 

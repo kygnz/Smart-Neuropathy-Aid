@@ -10,10 +10,13 @@ int calendarHeight = 350;   // Height of the calendar
 int circleSize = 30;        // Diameter of day circles
 int spacing = 10;           // Spacing between circles
 color bgColor = color(250); // Background color for the calendar
+int totalHeightC;
+float scrollOffsetC = 0;
+float itemHeightC = 100;
 
 // Sample data for alerts
 //HashMap<String, Boolean> alertsCalendar = new HashMap<String, Boolean>();
-HashMap<String, ArrayList<String>> alertsCalendar = new HashMap<String, ArrayList<String>>();
+HashMap<String, ArrayList<Integer>> alertsCalendar = new HashMap<String, ArrayList<Integer>>();
 
 String[] months = {"September", "October", "November", "December"};
 int[] daysInMonth = {30, 31, 30, 31};
@@ -76,16 +79,6 @@ void drawCalendar() {
     } else {
       fill(134, 203, 146); // Green for no-alert days
     }
-    //// Determine fill color
-    //if (currentMonthIndex > todayMonthIndex || (currentMonthIndex == todayMonthIndex && day > todayDate)) {
-    //  fill(200); // Light grey for future dates
-    //} else if (currentMonthIndex == todayMonthIndex && day == todayDate) {
-    //  fill(42, 157, 143); //Dark for today
-    //} else if (alertsCalendar.containsKey(months[currentMonthIndex] + "-" + day) && alertsCalendar.get(months[currentMonthIndex] + "-" + day)) {
-    //  fill(231, 111, 81); // Red for days with alerts
-    //} else {
-    //  fill(134, 203, 146); // Green for days without alerts
-    //}
 
     // Draw circle for the day
     ellipse(x, y, circleSize, circleSize);
@@ -135,26 +128,75 @@ void drawAlertDetails() {
   textSize(16);
   text("Back", 60, 30);
 
-  // Display alerts for the selected date
-  if (alertsCalendar.containsKey(selectedDate)) {
-    fill(50);
-    textSize(20);
-    textAlign(CENTER, CENTER);
-    text("Alerts on " + selectedDate, width / 2, height / 10);
+  // Header
+  fill(0, 48, 73);
+  textAlign(CENTER, CENTER);
+  textSize(34);
+  text("Alerts on " + selectedDate, width / 2, height / 10);
 
-    textSize(16);
-    ArrayList<String> alerts = alertsCalendar.get(selectedDate);
-    for (int i = 0; i < alerts.size(); i++) {
-      text(alerts.get(i), width / 2, height / 10 * 2 + i * 30);
+  // Display alerts with scrolling
+  ArrayList<Integer> alertIndices = alertsCalendar.getOrDefault(selectedDate, new ArrayList<Integer>());
+   totalHeight = int(alertIndices.size() * itemHeight); // Calculate total height
+
+  
+    pushMatrix();
+    translate(0, -scrollOffset); // Apply scrolling offset
+
+    float y = 130; // Starting y position
+    for (int index : alertIndices) {
+      alerts.get(index).display(30, y, width - 60, 80); // Display alert at index
+      y += itemHeight; // Spacing between alerts
     }
-  }
+
+    popMatrix();
+
+    // Draw scrollbar if content exceeds the viewable area
+    //if (totalHeight > height - 130) {
+      drawScrollbarC(int(alertIndices.size() * itemHeight));
+    //}
+  
+  //background(236);
+
+  //// Back button
+  //fill(200);
+  //rect(10, 10, 100, 40, 10);
+  //fill(0);
+  //textAlign(CENTER, CENTER);
+  //textSize(16);
+  //text("Back", 60, 30);
+
+  //// Display alerts for the selected date
+  //if (alertsCalendar.containsKey(selectedDate)) {
+  //  fill(50);
+  //  textSize(20);
+  //  textAlign(CENTER, CENTER);
+  //  text("Alerts on " + selectedDate, width / 2, height / 10);
+
+  //  textSize(16);
+  //  ArrayList<Integer> alertIndices = alertsCalendar.get(selectedDate);
+  //  for (int i = 0; i < alertIndices.size(); i++) {
+  //    int alertIndex = alertIndices.get(i);
+  //    alerts.get(alertIndex).display(30, height / 10 * 2 + i * 80, width - 60, 70);
+  //  }
+  //}
 }
 
-void addAlert(String date, String alert) {
+// Draws the scrollbar for the alerts screen
+void drawScrollbarC(int totalHeightC) {
+  float scrollbarHeight = map(windowHeight, 0, totalHeightC, 0, height);
+  float scrollbarY = map(scrollOffset, 0, totalHeightC - windowHeight, 0, height - scrollbarHeight);
+
+  fill(255);
+  rect(width - 10, 0, 10, height); // Background scrollbar
+  fill(240);
+  rect(width - 10, scrollbarY, 10, scrollbarHeight); // Scrolling thumb
+}
+
+void addAlert(String date, int alertIndex) {
   if (!alertsCalendar.containsKey(date)) {
-    alertsCalendar.put(date, new ArrayList<String>());
+    alertsCalendar.put(date, new ArrayList<Integer>());
   }
-  alertsCalendar.get(date).add(alert);
+  alertsCalendar.get(date).add(alertIndex);
 }
 
 String getCurrentDate() {
